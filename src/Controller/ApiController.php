@@ -14,36 +14,34 @@ class ApiController extends AbstractController
      * @Route("/api/v1/{id}", name="pokemon_endpoint")
      */
     public function index(
-        $id,
+        int $id,
         DocumentManager $dm,
-        HttpClientInterface $client
+        HttpClientInterface $httpClient
     )
     {
-        $pokemon = $dm->getRepository(Pokemon::class)->findByPokeApiId($id);
+        $mongoClient = $dm->getClient();
+        $collection = $mongoClient->selectCollection("PokemonApi","Pokemon");
+        $pokemon = $collection->findOne([
+            'id' =>  $id,
+        ]);
 
         if (!$pokemon) {
-            $pokeApiResponse = $client->request(
+            $pokeApiResponse = $httpClient->request(
                 'GET',
-                'https://pokeapi.co/api/v2/pokemon/' . $id
+                'https://pokeapi.co/api/v2/pokemon/' . $id,
+                [
+                    "bindto" => "0:0"
+                ]
             );
 
             if(!$pokeApiResponse) {
                 throw $this->createNotFoundException('No Pokemon found for id ' . $id);
             }
 
-            $pokemonData = json_decode($pokeApiResponse->getContent());
-
-            $pokemon = new Pokemon();
-            $pokemon->setPokeApiId($id);
-            $pokemon->setName($pokemonData->name);
-
-            $dm->persist($pokemon);
-            $dm->flush();
+            $pokemon = json_decode($pokeApiResponse->getContent());
+            $collection->insertOne($pokemon);
         }
 
-        return $this->json([
-            'message' => 1,
-            'path' => 'src/Controller/ApiController.php',
-        ]);
+        return $this->json($pokemon);
     }
 }
