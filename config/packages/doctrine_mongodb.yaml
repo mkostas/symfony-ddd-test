@@ -1,4 +1,6 @@
 doctrine_mongodb:
+    types:
+        Name: App\Domain\Pokemon\ValueObject\Name\NameType
     auto_generate_proxy_classes: true
     auto_generate_hydrator_classes: true
     connections:
@@ -13,6 +15,6 @@ doctrine_mongodb:
                 App:
                     is_bundle: false
                     type: annotation
-                    dir: '%kernel.project_dir%/src/Document'
-                    prefix: 'App\Document'
+                    dir: '%kernel.project_dir%/src/Domain/Pokemon'
+                    prefix: 'App\Domain\Pokemon'
                     alias: App
