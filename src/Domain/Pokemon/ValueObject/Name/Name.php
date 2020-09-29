@@ -6,7 +6,7 @@ use JsonSerializable;
 
 final class Name implements JsonSerializable
 {
-    private string $name;
+    public string $name;
     
     /**
      * Name constructor.

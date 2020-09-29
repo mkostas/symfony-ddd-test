@@ -24,4 +24,23 @@ class Pokemon
      */
     private Name $name;
     
+    /**
+     * @MongoDB\Field(type="raw")
+     */
+    private array $stats;
+    
+    /**
+     * @return Name
+     */
+    public function getName(): Name
+    {
+        return $this->name;
+    }
+    
+    public function getHp(): int
+    {
+        return $this->stats[0]['base_stat'];
+    }
+    
+    
 }

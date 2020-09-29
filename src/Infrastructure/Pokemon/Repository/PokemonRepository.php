@@ -6,21 +6,35 @@ use App\Domain\Pokemon\Pokemon;
 use App\Domain\Pokemon\Repository\PokemonRepositoryInterface;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 use Doctrine\Bundle\MongoDBBundle\Repository\ServiceDocumentRepository;
-
+use Doctrine\ODM\MongoDB\DocumentManager;
+use stdClass;
 
 class PokemonRepository extends ServiceDocumentRepository implements PokemonRepositoryInterface
 {
-    public function __construct(ManagerRegistry $registry)
+    /**
+     * @var DocumentManager
+     */
+    private DocumentManager $documentManager;
+    
+    public function __construct(ManagerRegistry $registry, DocumentManager $documentManager)
     {
         parent::__construct($registry, Pokemon::class);
+        $this->documentManager = $documentManager;
     }
 
-    public function get(int $id) : Pokemon
+    public function get(int $id) : ?Pokemon
     {
-        $query =  $this->createQueryBuilder()
+        return $this->createQueryBuilder()
             ->field('id')->equals($id)
             ->getQuery()->getSingleResult();
-    
-            return $query;
     }
+    
+    public function store(stdClass $pokemon): void
+    {
+        $mongoClient = $this->documentManager->getClient();
+        $collection = $mongoClient->selectCollection("PokemonApi","Pokemon");
+        $collection->insertOne($pokemon);
+    }
+    
+    
 }

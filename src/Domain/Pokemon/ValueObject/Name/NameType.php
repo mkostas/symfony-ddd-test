@@ -11,7 +11,12 @@ class NameType extends Type
     public function convertToPHPValue($value)
     {
         //return Name::fromString((string)$value);
+        //return new Name($value);
+        //return (new Name($value))->toString();
         return new Name($value);
+        //dump($name);
+       
+        //return $name->jsonSerialize();
     }
     
     public function convertToDatabaseValue($value)
